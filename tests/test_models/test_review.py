@@ -1,29 +1,169 @@
 #!/usr/bin/python3
-""" """
-from tests.test_models.test_base_model import test_basemodel
+"""Test models for BaseModel class"""
+
+
+import unittest
+import os
+import pep8
+from models.base_model import BaseModel
+from models.engine.file_storage import FileStorage
+from models import storage
+from datetime import datetime
 from models.review import Review
 
 
-class test_review(test_basemodel):
-    """ """
+class TestReview(unittest.TestCase):
+    """tests for base model class"""
 
-    def __init__(self, *args, **kwargs):
-        """ """
-        super().__init__(*args, **kwargs)
-        self.name = "Review"
-        self.value = Review
+    def test_pep8_review(self):
+        """check if class conforms pep8 quidelines"""
+        style_pep = pep8.StyleGuide()
+        file_result = style_pep.check_files(['models/review.py'])
+        errs = file_result.get_statistics('E')
+        error_messages = [f'{error[0]}:{error[1]}: {error[2]}'
+                          for error in errs]
 
-    def test_place_id(self):
-        """ """
-        new = self.value()
-        self.assertEqual(type(new.place_id), str)
+    def test_instance(self):
+        """testing for type of class"""
+        self.assertEqual(Review, type(Review()))
+        person = Review()
+        self.assertIsInstance(person, BaseModel)
 
-    def test_user_id(self):
-        """ """
-        new = self.value()
-        self.assertEqual(type(new.user_id), str)
+    def test_attr_id(self):
+        """testing class type of id attribute"""
+        self.assertEqual(str, type(Review().id))
 
-    def test_text(self):
-        """ """
-        new = self.value()
-        self.assertEqual(type(new.text), str)
+    def test_id_diff(self):
+        base_1 = Review()
+        base_2 = Review()
+        base_3 = Review()
+        self.assertTrue(base_1.id != base_2.id)
+        self.assertTrue(base_1.id != base_3.id)
+        self.assertTrue(base_2.id != base_3.id)
+
+    def test_attr_created_at(self):
+        """testing type of created_at attribute"""
+        self.assertEqual(datetime, type(Review().created_at))
+
+    def test_attr_updated_at(self):
+        """testing type of updated_at attribute"""
+        self.assertEqual(datetime, type(Review().updated_at))
+
+    def test_attr_place_id(self):
+        """testing type of place_id attribute"""
+        self.assertEqual(str, type(Review().place_id))
+
+    def test_attr_user_id(self):
+        """testing type of user_id attribute"""
+        self.assertEqual(str, type(Review().user_id))
+
+    def test_attr_text(self):
+        """testing type of text attribute"""
+        self.assertEqual(str, type(Review().text))
+
+    def test_attr_dict_empty(self):
+        """empty dictionary"""
+        dicts = {}
+        base = Review(**dicts)
+        self.assertTrue(type(base.id) == str)
+        self.assertTrue(type(base.created_at) == datetime)
+        self.assertTrue(type(base.updated_at) == datetime)
+        self.assertNotIn("__class__", base.__dict__.keys())
+
+    def test_attr_dict_none(self):
+        """None is passed"""
+        bases = Review(None)
+        self.assertNotIn(None, bases.__dict__.values())
+
+    def test_str(self):
+        """checking output for __str__"""
+        b_1 = Review()
+        self.assertEqual(b_1.__str__(), "[" + b_1.__class__.__name__ + "]"
+                         " (" + b_1.id + ") " + str(b_1.__dict__))
+
+
+class TestBaseModelSave(unittest.TestCase):
+    """test class for save method"""
+
+    def setUp(self):
+        """method run ofor each test in class"""
+        with open("tests.json", 'w'):
+            FileStorage._FileStorage__file_path = "tests.json"
+            FileStorage._FileStorage__objects = {}
+
+    def tearDown(self):
+        """ destroys file for each test after running it"""
+        FileStorage._FileStorage__file_path = "file.json"
+        try:
+            os.remove("tests.json")
+        except FileNotFoundError:
+            pass
+
+    def test_save1(self):
+        """checking if updated_at times are different"""
+        base_4 = Review()
+        old = base_4.updated_at
+        base_4.save()
+        new = base_4.updated_at
+        self.assertLess(old, new)
+
+    def test_save2(self):
+        """test when none is passed"""
+        base_5 = Review()
+        with self.assertRaises(TypeError):
+            base_5.save(None)
+
+    def test_save3(self):
+        """test if instance is actually stored"""
+        b_2 = Review()
+        b_2.save()
+        b_id = "Review." + b_2.id
+        with open("tests.json", "r") as f:
+            self.assertIn(b_id, f.read())
+
+
+class TestToDict(unittest.TestCase):
+    """tests for method to_dicts"""
+
+    def test_dict_instance(self):
+        """test if it is a dictionary"""
+        base_6 = Review()
+        self.assertEqual(dict, type(base_6.to_dict()))
+
+    def test_dict_type_attr(self):
+        """checking class type for attributes"""
+        base_7 = Review()
+        dicts = base_7.to_dict()
+        self.assertTrue(type(dicts["created_at"] == str))
+        self.assertTrue(type(dicts["updated_at"] == str))
+        self.assertTrue(type(base_7.created_at) == datetime)
+        self.assertTrue(type(base_7.updated_at) == datetime)
+        self.assertEqual(dicts["created_at"], base_7.created_at.isoformat())
+        self.assertEqual(dicts["updated_at"], base_7.updated_at.isoformat())
+
+        # checking if keys exists
+        self.assertIn("id", base_7.to_dict())
+        self.assertIn("created_at", base_7.to_dict())
+        self.assertIn("updated_at", base_7.to_dict())
+        self.assertIn("__class__", base_7.to_dict())
+
+    def test_attr_added(self):
+        """check if attributes added to dict"""
+        base_7 = Review()
+        base_7.text = "Alx"
+        base_7.place_id = "eve@gmail.com"
+        base_7.user_id = "root"
+        self.assertIn("text", base_7.to_dict())
+        self.assertIn("place_id", base_7.to_dict())
+        self.assertIn("user_id", base_7.to_dict())
+
+    def test_not_same(self):
+        """dicts created and self dict not same"""
+        b_5 = Review()
+        self.assertNotEqual(b_5.to_dict(), b_5.__dict__)
+
+    def test_wrong_type(self):
+        """passing none"""
+        b_0 = Review()
+        with self.assertRaises(TypeError):
+            b_0.to_dict(None)
