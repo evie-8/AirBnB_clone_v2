@@ -12,15 +12,19 @@ class BaseModel:
     def __init__(self, *args, **kwargs):
         """creating instances"""
         if kwargs:
-            new_dicts = kwargs.copy()
-            removed = "__class__"
-            if removed in new_dicts.keys():
-                del new_dicts["__class__"]
+            if 'id' not in kwargs.keys():
+                self.id = str(uuid.uuid4())
+            if 'created_at' not in kwargs.keys():
+                self.created_at = datetime.today()
+            if 'updated_at' not in kwargs.keys():
+                self.updated_at = datetime.today()
+
             style = "%Y-%m-%dT%H:%M:%S.%f"
-            for k in new_dicts:
+            for k, v in kwargs.items():
                 if k == "created_at" or k == "updated_at":
-                    new_dicts[k] = datetime.strptime(new_dicts[k], style)
-            self.__dict__ = new_dicts
+                    v = datetime.strptime(v, style)
+                if k != '__class__':
+                    setattr(self, k, v)
         else:
             self.id = str(uuid.uuid4())
             self.created_at = datetime.today()

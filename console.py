@@ -56,6 +56,32 @@ class HBNBCommand(cmd.Cmd):
             new_obj = HBNBCommand.dicts[token[0]]()
             new_obj.save()
             print(new_obj.id)
+        elif len(token) > 1:
+            match = re.match(r'(\w+)\s+(.*)', line)
+            args = match.group(2)
+            key_pair = [key.strip() for key in args.split()]
+            dict_new = {}
+            for pair in key_pair:
+                key, value = pair.split('=')
+                value = value.strip('"').replace('_', ' ')
+                value = value.replace('"', '\"')
+                val = value
+                if val.isdigit() or (
+                    val.startswith("-") and val[1:].isdigit()
+                ):
+                    val = int(val)
+                elif self.is_float(val):
+                    val = float(val)
+                elif isinstance(val, str):
+                    val = str(val)
+                else:
+                    print("value is neither a float, integer nor string")
+                dict_new[key] = val
+            new_obj = HBNBCommand.dicts[token[0]]()
+            for k, v in dict_new.items():
+                setattr(new_obj, k, v)
+            new_obj.save()
+            print(new_obj.id)
 
     def do_show(self, line):
         """showing object attributes
