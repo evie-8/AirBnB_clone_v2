@@ -11,6 +11,7 @@ env.hosts = ['52.91.136.4', '34.229.184.55']
 
 
 def do_deploy(archive_path):
+    """deploying using fab"""
     if exists(archive_path) is False:
         return False
 
