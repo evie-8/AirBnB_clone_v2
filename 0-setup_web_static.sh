@@ -26,8 +26,8 @@ echo '
 if [ -L "/data/web_static/current" ]; then
     sudo rm "/data/web_static/current"
 fi
-sudo ln -s /data/web_static/releases/test /data/web_static/current
+sudo ln -sf /data/web_static/releases/test /data/web_static/current
 
-sudo chown -R ubuntu:ubuntu /data/
+sudo chown -hR ubuntu:ubuntu /data/
 sudo sed -i '15 i \\n\tlocation /hbnb_static/ {\n\talias /data/web_static/current/;\n\t}' /etc/nginx/sites-available/default
 sudo service nginx restart
