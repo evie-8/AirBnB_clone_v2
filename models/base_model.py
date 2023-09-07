@@ -5,10 +5,20 @@
 import uuid
 from datetime import datetime
 from models import storage
+from sqlalchemy.ext.declarative import declarative_base
+from model import storage_type
 
+Base = declarative_base()
 
 class BaseModel:
     """Base class that defines all common attributes"""
+
+    if getenv("HBNB_TYPE_STORAGE") == 'db':
+        id = Column(String(60), nullable=False, primary_key=True)
+        created_at = Column(DateTime, nullable=False, default=datetime.utcnow)
+        updated_at = Column(DateTime, nullable=False, default=datetime.utcnow)
+
+
     def __init__(self, *args, **kwargs):
         """creating instances"""
         if kwargs:
@@ -48,3 +58,7 @@ class BaseModel:
         dicts["created_at"] = self.created_at.isoformat()
         dicts["updated_at"] = self.updated_at.isoformat()
         return dicts
+
+    def delete(self):
+        """elete the current instance from the storage """
+        models.storage.delete(self)
