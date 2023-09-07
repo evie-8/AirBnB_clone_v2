@@ -1,4 +1,30 @@
 #!/usr/bin/python3
+<<<<<<< HEAD
+"""db storage engine"""
+
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker, scoped_session
+from models.amenity import Amenity
+from models.base_model import Base
+from models.city import City
+from models.place import Place
+from models.review import Review
+from models.state import State
+from models.user import User
+from os import getenv
+
+if getenv('HBNB_TYPE_STORAGE') == 'db':
+    from models.place import place_amenity
+
+classes = {"User": User, "State": State, "City": City,
+           "Amenity": Amenity, "Place": Place, "Review": Review}
+
+
+class DBStorage:
+    '''database storage engine for mysql storage'''
+    __engine = None
+    __session = None
+=======
 """Module for database storage"""
 
 
@@ -82,3 +108,4 @@ class DBStorage:
                                expire_on_commit=False)
         sessions = scoped_session(Session)
         self.__session = sessions
+>>>>>>> de054e02cca2f4bcb0a7185a2468a28c1f596336

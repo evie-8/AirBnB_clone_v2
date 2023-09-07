@@ -4,18 +4,34 @@
 
 import uuid
 from datetime import datetime
+<<<<<<< HEAD
+from models import storage
+from sqlalchemy.ext.declarative import declarative_base
+from model import storage_type
+=======
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy import Column, String, Integer, DateTime
 
 
 Base = declarative_base()
+>>>>>>> de054e02cca2f4bcb0a7185a2468a28c1f596336
 
+Base = declarative_base()
 
 class BaseModel:
     """Base class that defines all common attributes"""
+<<<<<<< HEAD
+
+    if getenv("HBNB_TYPE_STORAGE") == 'db':
+        id = Column(String(60), nullable=False, primary_key=True)
+        created_at = Column(DateTime, nullable=False, default=datetime.utcnow)
+        updated_at = Column(DateTime, nullable=False, default=datetime.utcnow)
+
+=======
     id = Column(String(60), primary_key=True, nullable=False)
     created_at = Column(DateTime, default=datetime.utcnow(), nullable=False)
     updated_at = Column(DateTime, nullable=False, default=datetime.utcnow())
+>>>>>>> de054e02cca2f4bcb0a7185a2468a28c1f596336
 
     def __init__(self, *args, **kwargs):
         """creating instances"""
@@ -64,6 +80,11 @@ class BaseModel:
         return dicts
 
     def delete(self):
+<<<<<<< HEAD
+        """elete the current instance from the storage """
+        models.storage.delete(self)
+=======
         """delete current instance"""
         from models import storage
         storage.delete(self)
+>>>>>>> de054e02cca2f4bcb0a7185a2468a28c1f596336
