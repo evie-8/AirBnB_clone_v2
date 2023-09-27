@@ -76,3 +76,7 @@ class FileStorage:
         if obj:
             k = "{}.{}".format(type(obj).__name__, obj.id)
             del FileStorage.__objects[k]
+
+    def close(self):
+        """adding new method"""
+        self.__objects = self.reload()

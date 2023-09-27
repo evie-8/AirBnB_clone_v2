@@ -12,7 +12,7 @@ class Amenity(BaseModel, Base):
     """
     __tablename__ = 'amenities'
 
-    if storage_type = 'db':
+    if storage_type == 'db':
 
         name = Column(String(128), nullable=False)
 
